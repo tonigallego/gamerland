@@ -1,0 +1,2 @@
+insert into usuarios (nombre, password, email, avatar, estado) 
+values ('link_24', md5('equidna'), 'link24@gmail.com', 'usuarios/link.png', 'Nuevo poseedor de PS4!');

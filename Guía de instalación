@@ -1,0 +1,94 @@
+POSTGRE Y SQL
+
+--> Instalamos los paquetes postgresql:
+
+sudo apt-get install postgresql-9.3 postgresql-client-9.3
+
+
+--> Nos convertimos en el usuario postgres del sistema operativo para realizar las operaciones necesarias:
+
+sudo -i (nos convertimos primeros en usuario root)
+su - postgres
+
+
+--> Ahora creamos el usuario administrador de la base de datos:
+
+createuser -P administrador
+
+
+--> Creamos una base de datos llamada juegos:
+
+createdb -O administrador juegos
+
+
+--> Creamos ahora un usuario normal de base de datos que se va a usar para manejar la base de datos:
+
+createuser -P usuario
+
+
+--> Volvemos al usuario inicial del S.O.:
+
+Pulsamos dos veces Cntrl + D (la primera hace que se vuelva al root y la segunda al usuario normal)
+
+
+--> Ahora debemos modificar el archivo pg_hba de forma que cuando nos conectemos mediante cualquier usuario o tpc/ip, nos pida contraseña:
+
+sudo gedit /etc/postgresql/9.3/main/pg_hba.conf
+
+Serán necesarias estas líneas:
+local   all         postgres                          ident
+local   all         all                               md5
+host    all         all         127.0.0.1/32          md5
+
+
+--> Por si queremos que el postgres se quede a la escucha para conectarse otro equipo a él, hay que entrar en el siguiente archivo:
+
+sudo gedit /etc/postgresql/9.3/main/postgresql.conf
+
+--> y una vez en él, quitar el comentario (#) de la siguiente frase:
+
+#listen_addresses = 'localhost'
+
+
+
+APACHE Y PHP
+
+--> Para la instalación de apache, php y el paquete que permite a php acceder al sql:
+
+sudo apt-get install apache2 php5 php5-pgsql
+
+
+--> Hay que editar la configuracióin de apache2 para que detecte UTF-8 y se entrando al siguiente archivo:
+
+sudo gedit /etc/apache2/conf.d/charset
+
+
+--> Hay que eliminar el # de la siguiente línea, y luego reiniciamos el servidor para que se hagan efectivos los cambios:
+
+AddDefaultCharset UTF-8
+
+sudo service apache2 restart
+
+
+--> Lo único que publicará el apache al exterior es lo que está en la carpeta /var/www, es decir que si escribimos http://localhost/pepito.html, buscará el fichero pepito.html dentro de la carpeta /var/www. Si ponemos únicamente http://localhost/ se irá al archivo /var/www/index.html
+
+--> Debido a que para acceder a /var/www es necesario estar como root y por tanto es demasiado incómodo estar haciendo sudo todo el tiempo, creamos una carpeta llamada web en el directorio del usuario corriente, y que será un enlace simbólico a /var/www. Para ello:
+
+mkdir /home/(usuario correspondiente)/web
+
+sudo ln -s /home/(usuario correspondiente)/web /var/www/html
+
+En la carpeta www, colocamos la carpeta juegos correspondiente al proyecto Gamerland
+
+
+--> Ahora vamos al archivo php.ini para configurar 2 opciones de error a "On". Esto hará que nos muestren los errores de php en la página html, lo que es bastante útil durante el desarrollo del php, aunque a la hora de que el servidor vaya a funcionar para el cliente, lo ideal es dejarlo en "Off".
+
+sudo gedit /etc/php5/apache2/php.ini
+
+display_errors = On
+
+display_startup_errors = On
+
+
+--> Por último, ya tan solo queda abrir el navegador y escribir la siguiente dirección: 
+http://localhost/web/juegos/index.php/juegos
